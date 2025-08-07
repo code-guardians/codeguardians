@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login & Personalized Greeting</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f4f4f4;
+      margin: 0;
+      flex-direction: column;
+    }
+    #login-page {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      width: 300px;
+      text-align: center;
+    }
+    #login-page h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+    }
+    .form-group input[type="email"],
+    .form-group input[type="password"] {
+      width: calc(100% - 20px);
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .error-message {
+      color: red;
+      font-size: 0.9em;
+      margin-top: 5px;
+      display: none; /* hidden by default */
+    }
+    .login-button {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1em;
+      width: 100%;
+    }
+    .login-button:hover {
+      background-color: #0056b3;
+    }
+    #greeting-page {
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      display: none;
+    }
+    .greeting-message {
+      font-size: 2.5em;
+      color: #333;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="login-page">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required />
+        <div class="error-message" id="emailError">Please enter a valid email address.</div>
+      </div>
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required />
+        <div class="error-message" id="passwordError">Password must be at least 6 characters long.</div>
+      </div>
+      <button type="submit" class="login-button">Login</button>
+    </form>
+  </div>
+
+  <div id="greeting-page">
+    <div class="greeting-message" id="greetingMessage"></div>
+  </div>
+
+  <script>
+    const loginPage = document.getElementById('login-page');
+    const greetingPage = document.getElementById('greeting-page');
+    const loginForm = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const greetingMessage = document.getElementById('greetingMessage');
+
+    loginForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      // Reset error messages
+      emailError.style.display = 'none';
+      passwordError.style.display = 'none';
+
+      let isValid = true;
+
+      // Validate email format
+      if (!emailInput.value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        emailError.style.display = 'block';
+        isValid = false;
+      }
+
+      // Validate password length
+      if (passwordInput.value.length < 6) {
+        passwordError.style.display = 'block';
+        isValid = false;
+      }
+
+      if (!isValid) return;
+
+      // On valid input, move to greeting page regardless of exact credentials
+      loginPage.style.display = 'none';
+      greetingPage.style.display = 'block';
+      initializeGreetingPage(emailInput.value);
+    });
+
+    function getGreeting(name) {
+      const now = new Date();
+      const hour = now.getHours();
+      let timeOfDayGreeting = "";
+
+      if (hour >= 5 && hour < 12) {
+        timeOfDayGreeting = "Good Morning";
+      } else if (hour >= 12 && hour < 17) {
+        timeOfDayGreeting = "Good Afternoon";
+      } else if (hour >= 17 && hour < 21) {
+        timeOfDayGreeting = "Good Evening";
+      } else {
+        timeOfDayGreeting = "Good Night";
+      }
+      return `${timeOfDayGreeting}, ${name}!`;
+    }
+
+    function extractNameFromEmail(email) {
+      let namePart = email.split('@')[0];
+      namePart = namePart.replace(/[._-]/g, ' ');
+      namePart = namePart
+        .split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+      if (namePart.trim() === '') {
+        return 'User';
+      }
+      return namePart.trim();
+    }
+
+    function initializeGreetingPage(userEmail) {
+      const userName = extractNameFromEmail(userEmail);
+      greetingMessage.textContent = getGreeting(userName);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loginPage.style.display = 'block';
+      greetingPage.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
